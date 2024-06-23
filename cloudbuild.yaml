@@ -1,0 +1,26 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - "build"
+      - "-t"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/tourtle-artifact/backend-image:$COMMIT_SHA"
+      - "."
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - "push"
+      - "us-central1-docker.pkg.dev/$PROJECT_ID/tourtle-artifact/backend-image:$COMMIT_SHA"
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "deploy"
+      - "backend"
+      - "--image=us-central1-docker.pkg.dev/$PROJECT_ID/tourtle-artifact/backend-image:$COMMIT_SHA"
+      - "--region=us-central1"
+      - "--cpu=1"
+      - "--memory=2048Mi"
+      - "--allow-unauthenticated"
+      - "--set-secrets=FIREBASE_API_KEY=firebase_api_key:latest,FIREBASE_AUTH_DOMAIN=firebase_auth_domain:latest,FIREBASE_PROJECT_ID=firebase_project_id:latest,FIREBASE_STORAGE_BUCKET=firebase_storage_bucket:latest,FIREBASE_MESSAGING_SENDER_ID=firebase_messaging_sender_id:latest, FIREBASE_APP_ID=firebase_app_id:latest, FIREBASE_DATABASE_URL=firebase_database_url:latest, type=type:latest, project_id=project_id:latest, private_key_id=private_key_id:latest, private_key=private_key:latest, client_email=client_email:latest, client_id=client_id:latest, auth_uri=auth_uri:latest, token_uri=token_uri:latest, auth_provider_x509_cert_url=auth_provider_x509_cert_url:latest, client_x509_cert_url=client_x509_cert_url:latest, universe_domain=universe_domain:latest,"
+images:
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/tourtle-artifact/backend-image:$COMMIT_SHA"
+logsBucket: "gs://tourtle-buckets-backend/logs"
